@@ -4,7 +4,7 @@
  */
 
 #include "SeekDevice.h"
-#include "SeekLogging.h"
+#include "SeekLoggingInternal.h"
 #include <libusb.h>
 #include <endian.h>
 #include <stdio.h>

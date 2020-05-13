@@ -4,7 +4,7 @@
  */
 
 #include "SeekCam.h"
-#include "SeekLogging.h"
+#include "SeekLoggingInternal.h"
 #include <iomanip>
 
 using namespace LibSeek;

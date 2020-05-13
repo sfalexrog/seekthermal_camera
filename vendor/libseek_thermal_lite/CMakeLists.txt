@@ -21,6 +21,7 @@ add_library(seek_thermal STATIC
   src/SeekDevice.cpp
   src/SeekThermal.cpp
   src/SeekThermalPro.cpp
+  src/SeekLogging.cpp
 )
 
 target_include_directories(seek_thermal
