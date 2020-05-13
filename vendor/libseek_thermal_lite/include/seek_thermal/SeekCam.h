@@ -64,10 +64,14 @@ public:
      */
     virtual uint16_t device_temp_sensor() = 0;
 
+    /*
+     *  Virtual destructor (should be accessible outside of the class hierarchy)
+     */
+    virtual ~SeekCam();
+
 protected:
 
     SeekCam(int vendor_id, int product_id, uint16_t* buffer, size_t raw_height, size_t raw_width, cv::Rect roi, std::string ffc_filename);
-    ~SeekCam();
 
     virtual bool init_cam() = 0;
     virtual int frame_id() = 0;
