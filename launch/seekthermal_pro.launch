@@ -1,0 +1,7 @@
+<launch>
+    <node name="seekthermalpro" pkg="seekthermal_camera" type="seekthermal_node" output="screen">
+        <param name="type" value="seekpro"/>
+        <param name="camera_name" value="seekpro"/>
+        <param name="frame_id" value="seekpro_optical"/>
+    </node>
+</launch>

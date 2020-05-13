@@ -56,6 +56,9 @@
   <depend>roscpp</depend>
   <depend>nodelet</depend>
   <depend>sensor_msgs</depend>
+  <depend>image_transport</depend>
+  <depend>cv_bridge</depend>
+  <depend>camera_info_manager</depend>
   <build_depend>libusb-1.0-dev</build_depend>
   <exec_depend>libusb-1.0</exec_depend>
 

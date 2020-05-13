@@ -11,6 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   nodelet
   sensor_msgs
+  image_transport
+  cv_bridge
+  camera_info_manager
 )
 
 ## System dependencies are found with CMake's conventions
@@ -127,6 +130,24 @@ include_directories(
 #   src/${PROJECT_NAME}/seekthermal_camera.cpp
 # )
 
+add_library(seekthermal_ros
+  src/seekthermal_ros.cpp
+)
+
+# Link against vendored library
+target_link_libraries(seekthermal_ros PUBLIC seek_thermal)
+target_include_directories(seekthermal_ros PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${catkin_INCLUDE_DIRS}
+)
+
+add_dependencies(seekthermal_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+add_executable(seekthermal_node src/seekthermal_ros_node.cpp)
+add_dependencies(seekthermal_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(seekthermal_node PUBLIC seekthermal_ros ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -168,17 +189,17 @@ include_directories(
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-# install(TARGETS ${PROJECT_NAME}_node
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS seekthermal_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-# install(TARGETS ${PROJECT_NAME}
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-# )
+install(TARGETS seekthermal_ros
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
@@ -193,6 +214,19 @@ include_directories(
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+
+# Only install udev rules when building a Debian package
+# FIXME: Other operating systems may have other prefixes
+string(FIND ${CMAKE_INSTALL_PREFIX} "/opt/ros" _PREFIX_INDEX)
+if (${_PREFIX_INDEX} EQUAL 0)
+  message(STATUS "Building as a Debian package - adding udev rules as installable files")
+  install(FILES
+    config/99-seekthermal.rules
+    DESTINATION /lib/udev/rules.d
+  )
+else()
+  message(STATUS "Building in a user workspace - not adding udev rules")
+endif()
 
 #############
 ## Testing ##
