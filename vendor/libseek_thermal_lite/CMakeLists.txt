@@ -33,3 +33,7 @@ target_include_directories(seek_thermal
 )
 
 target_link_libraries(seek_thermal PUBLIC Usb ${OpenCV_LIBS})
+
+target_compile_options(seek_thermal PRIVATE
+  -fpic -fPIC
+)
