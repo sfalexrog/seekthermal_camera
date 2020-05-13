@@ -13,7 +13,10 @@ else()
   message(FATAL_ERROR "Could not find libusb-1.0 development libraries")
 endif()
 
-add_library(seek_thermal SHARED
+# OpenCV 3+
+find_package(OpenCV 3 REQUIRED COMPONENTS core imgproc)
+
+add_library(seek_thermal STATIC
   src/SeekCam.cpp
   src/SeekDevice.cpp
   src/SeekThermal.cpp
@@ -26,6 +29,7 @@ target_include_directories(seek_thermal
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
+    ${OpenCV_INCLUDE_DIRS}
 )
 
-target_link_libraries(seek_thermal PUBLIC Usb)
+target_link_libraries(seek_thermal PUBLIC Usb ${OpenCV_LIBS})
