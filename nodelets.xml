@@ -1,5 +1,5 @@
-<library path="lib/libseekthermal_camera">
-  <class name="seekthermal/camera" type="seekthermal::camera" base_class_type="nodelet::Nodelet">
+<library path="lib/libseekthermal_nodelet">
+  <class name="seekthermal_camera/camera" type="seekthermal_camera::Camera" base_class_type="nodelet::Nodelet">
     <description>
       Seek Thermal camera driver.
     </description>

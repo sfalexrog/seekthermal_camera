@@ -148,6 +148,11 @@ add_executable(seekthermal_node src/seekthermal_ros_node.cpp)
 add_dependencies(seekthermal_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(seekthermal_node PUBLIC seekthermal_ros ${catkin_LIBRARIES})
+
+add_library(seekthermal_nodelet src/seekthermal_ros_nodelet.cpp)
+add_dependencies(seekthermal_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(seekthermal_nodelet PUBLIC seekthermal_ros ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -195,7 +200,7 @@ install(TARGETS seekthermal_node
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
-install(TARGETS seekthermal_ros
+install(TARGETS seekthermal_ros seekthermal_nodelet
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}

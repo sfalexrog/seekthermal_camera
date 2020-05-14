@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="nodelet" type="nodelet" name="thermal_manager" args="manager" output="screen"/>
+
+    <node pkg="nodelet" type="nodelet" name="seekthermalpro" args="load seekthermal_camera/camera thermal_manager" output="screen">
+        <param name="type" value="seekpro"/>
+        <param name="camera_name" value="seekpro"/>
+        <param name="frame_id" value="seekpro_optical"/>
+    </node>
+</launch>
