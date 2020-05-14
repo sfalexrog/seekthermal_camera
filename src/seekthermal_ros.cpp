@@ -90,7 +90,7 @@ bool SeekThermalRos::publish()
     header.stamp = ros::Time::now();
     header.frame_id = frame_id;
 
-    cv_bridge::CvImagePtr pubImg = boost::make_shared<cv_bridge::CvImage>(header, "mono16", thermalImg);
+    cv_bridge::CvImagePtr pubImg = boost::make_shared<cv_bridge::CvImage>(header, "16UC1", thermalImg);
     sensor_msgs::CameraInfoPtr cameraInfo = boost::make_shared<sensor_msgs::CameraInfo>(info_manager->getCameraInfo());
     cameraInfo->header.stamp = header.stamp;
     cameraInfo->header.frame_id = header.frame_id;
