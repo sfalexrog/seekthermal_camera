@@ -21,9 +21,16 @@ void seekRosCallback(LibSeek::Severity severity, const char* message, void* user
         case LibSeek::Severity::Debug:
             ros_severity = ros::console::levels::Level::Debug;
             break;
+        case LibSeek::Severity::Info:
+            ros_severity = ros::console::levels::Level::Info;
+            break;
+        case LibSeek::Severity::Warning:
+            ros_severity = ros::console::levels::Level::Warn;
         case LibSeek::Severity::Error:
             ros_severity = ros::console::levels::Level::Error;
             break;
+        case LibSeek::Severity::Fatal:
+            /* fall through */
         default:
             ros_severity = ros::console::levels::Level::Fatal;
     }

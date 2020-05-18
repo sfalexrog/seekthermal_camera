@@ -11,13 +11,16 @@ void logFnStdout(LibSeek::Severity severity, const char* message, void* user_dat
     switch(severity)
     {
         case LibSeek::Severity::Debug:
-#ifdef SEEK_DEBUG
+        case LibSeek::Severity::Info:
+        case LibSeek::Severity::Warning:
             std::printf("%s", message);
-#endif
             break;
+
         case LibSeek::Severity::Error:
+        case LibSeek::Severity::Fatal:
             std::fprintf(stderr, "%s", message);
             break;
+        
         default:
             std::fprintf(stderr, "Unexpected severity, expect failure. Message: %s", message);
     }
@@ -26,6 +29,7 @@ void logFnStdout(LibSeek::Severity severity, const char* message, void* user_dat
 // FIXME: What about multiple instances?
 LibSeek::LogFn* g_logFn = logFnStdout;
 void* g_userData = nullptr;
+LibSeek::Severity g_MinSeverity = LibSeek::Severity::Info;
 
 } // anonymous namespace
 
@@ -40,6 +44,7 @@ void setLogFn(const LogFn* log_callback, void* user_data)
 
 void log(Severity severity, const char* fmt, ...)
 {
+    if (severity < g_MinSeverity) return;
     va_list args1;
     va_start(args1, fmt);
     va_list args2;
@@ -52,4 +57,3 @@ void log(Severity severity, const char* fmt, ...)
 }
 
 }
-
