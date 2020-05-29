@@ -42,31 +42,11 @@ void seekRosCallback(LibSeek::Severity severity, const char* message, void* user
 SeekThermalRos::SeekThermalRos(const std::string nodeName, ros::NodeHandle& nh, ros::NodeHandle& nh_priv) : nodeName(nodeName), nh(nh), nh_priv(nh_priv)
 {
     LibSeek::setLogFn(seekRosCallback, this);
-    std::string model = nh_priv.param<std::string>("type", "seekpro");
+    model = nh_priv.param<std::string>("type", "seekpro");
     std::string cameraName = nh_priv.param<std::string>("camera_name", "seekpro");
     std::string cameraInfoUrl = nh_priv.param<std::string>("camera_info_url", "");
     frame_id = nh_priv.param<std::string>("frame_id", "seekpro_optical");
-    if (model == "seekpro")
-    {
-        seek_cam.reset(new LibSeek::SeekThermalPro());
-    }
-    else if (model == "seek")
-    {
-        seek_cam.reset(new LibSeek::SeekThermal());
-    }
-    else
-    {
-        ROS_ERROR_STREAM_NAMED(nodeName, "Unknown model type: " << model);
-        return;
-    }
 
-    if (!seek_cam->open())
-    {
-        ROS_ERROR_STREAM_NAMED(nodeName, "Failed to initialize camera");
-        return;
-    }
-
-    
     info_manager.reset(new camera_info_manager::CameraInfoManager(nh, cameraName, cameraInfoUrl));
 
     image_transport::ImageTransport it(nh_priv);
@@ -81,6 +61,39 @@ void SeekThermalRos::log(ros::console::levels::Level severity, const char* messa
     ROS_LOG_STREAM(severity, std::string(ROSCONSOLE_NAME_PREFIX) + "." + nodeName, message);
 }
 
+void SeekThermalRos::reset()
+{
+    if (model == "seekpro")
+    {
+        seek_cam.reset(new LibSeek::SeekThermalPro());
+    }
+    else if (model == "seek")
+    {
+        seek_cam.reset(new LibSeek::SeekThermal());
+    }
+    else
+    {
+        ROS_ERROR_STREAM_NAMED(nodeName, "Unknown model type: " << model);
+        ros::shutdown();
+    }
+}
+
+bool SeekThermalRos::init(int num_retries)
+{
+    reset();
+    while (num_retries-- != 0)
+    {
+        if (seek_cam->open())
+        {
+            return true;
+        }
+        else
+        {
+            ROS_WARN_NAMED(nodeName, "Could not initialize camera, retrying");
+        }
+    }
+    return false;
+}
 
 bool SeekThermalRos::publish()
 {

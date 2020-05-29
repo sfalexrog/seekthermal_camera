@@ -21,6 +21,13 @@ private:
     std::unique_ptr<camera_info_manager::CameraInfoManager> info_manager;
     std::unique_ptr<LibSeek::SeekCam> seek_cam;
     std::string frame_id;
+    std::string model;
+
+    /**
+     * Perform reset of the underlying driver. This recreates the
+     * underlying driver object.
+     */
+    void reset();
 
 public:
     /**
@@ -32,6 +39,14 @@ public:
      */
     SeekThermalRos(const std::string nodeName, ros::NodeHandle& nh, ros::NodeHandle& nh_priv);
     ~SeekThermalRos();
+
+    /**
+     * Perform underlying driver initialization.
+     * 
+     * @param num_retries Number of times we try to perform initialization before we give up.
+     * @return True if initialization is successful, false otherwise.
+     */
+    bool init(int num_retries = 1);
 
     void log(ros::console::levels::Level severity, const char* message);
     bool publish();

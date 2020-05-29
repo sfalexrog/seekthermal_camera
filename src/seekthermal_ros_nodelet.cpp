@@ -20,7 +20,8 @@ private:
         {
             if(!camera_connection.publish())
             {
-                // TODO: do something about that
+                // Try resetting the camera?
+                camera_connection.init();
             }
         }
     }

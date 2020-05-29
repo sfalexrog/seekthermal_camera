@@ -7,7 +7,10 @@ int main(int argc, char** argv)
     seekthermal_camera::SeekThermalRos seek("seekcam_node", nh, nh_priv);
     while (ros::ok())
     {
-        seek.publish();
+        if (!seek.publish())
+        {
+            seek.init();
+        }
         ros::spinOnce();
     }
     return 0;
