@@ -78,6 +78,10 @@ bool SeekDevice::open()
 
 void SeekDevice::close()
 {
+    // Reset device (in case we're re-initializing)
+    if (libusb_reset_device(m_handle)) {
+        warn("Device reset failed");
+    }
     if (m_handle != NULL) {
         libusb_release_interface(m_handle, 0);  /* release claim */
         libusb_close(m_handle);                 /* revert open */
