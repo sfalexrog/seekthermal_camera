@@ -108,6 +108,7 @@ bool SeekThermalRos::publish()
         cv::normalize(thermalImg, normPubImg->image, 0, 65536, cv::NORM_MINMAX);
         normalized_pub.publish(normPubImg->toImageMsg());
     }
+    return true;
 }
 
 }
