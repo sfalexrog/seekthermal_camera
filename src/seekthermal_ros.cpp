@@ -46,6 +46,16 @@ SeekThermalRos::SeekThermalRos(const std::string nodeName, ros::NodeHandle& nh, 
     std::string cameraName = nh_priv.param<std::string>("camera_name", "seekpro");
     std::string cameraInfoUrl = nh_priv.param<std::string>("camera_info_url", "");
     frame_id = nh_priv.param<std::string>("frame_id", "seekpro_optical");
+    std::string ffc_filename = nh_priv.param<std::string>("ffc_image", "");
+    if (ffc_filename != "")
+    {
+        ROS_INFO_STREAM_NAMED(nodeName, "Loading flat field calibration from " << ffc_filename);
+        ffc_image = cv::imread(ffc_filename, cv::ImreadModes::IMREAD_UNCHANGED);
+        if (ffc_image.empty())
+        {
+            ROS_ERROR_NAMED(nodeName, "Failed to load flat field calibration!");
+        }
+    }
 
     info_manager.reset(new camera_info_manager::CameraInfoManager(nh, cameraName, cameraInfoUrl));
 
@@ -65,11 +75,11 @@ void SeekThermalRos::reset()
 {
     if (model == "seekpro")
     {
-        seek_cam.reset(new LibSeek::SeekThermalPro());
+        seek_cam.reset(new LibSeek::SeekThermalPro(ffc_image));
     }
     else if (model == "seek")
     {
-        seek_cam.reset(new LibSeek::SeekThermal());
+        seek_cam.reset(new LibSeek::SeekThermal(ffc_image));
     }
     else
     {

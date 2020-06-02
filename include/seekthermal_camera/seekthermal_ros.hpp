@@ -22,6 +22,7 @@ private:
     std::unique_ptr<LibSeek::SeekCam> seek_cam;
     std::string frame_id;
     std::string model;
+    cv::Mat ffc_image;
 
     /**
      * Perform reset of the underlying driver. This recreates the

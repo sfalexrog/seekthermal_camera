@@ -3,5 +3,6 @@
         <param name="type" value="seekpro"/>
         <param name="camera_name" value="seekpro"/>
         <param name="frame_id" value="seekpro_optical"/>
+        <param name="ffc_image" value="$(find seekthermal_camera)/data/ffc_pro.png"/>
     </node>
 </launch>
