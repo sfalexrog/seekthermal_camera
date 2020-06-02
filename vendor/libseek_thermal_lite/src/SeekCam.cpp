@@ -29,6 +29,26 @@ SeekCam::SeekCam(int vendor_id, int product_id, uint16_t* buffer, size_t raw_hei
     m_raw_frame = m_raw_frame(roi);
 }
 
+SeekCam::SeekCam(int vendor_id, int product_id, uint16_t* buffer, size_t raw_height, size_t raw_width, cv::Rect roi, const cv::Mat& ffc_image) :
+    m_offset(0x4000),
+    m_ffc_filename(),
+    m_is_opened(false),
+    m_dev(vendor_id, product_id),
+    m_raw_data(buffer),
+    m_raw_data_size(raw_height * raw_width),
+    m_raw_frame(raw_height,
+                raw_width,
+                CV_16UC1,
+                buffer,
+                cv::Mat::AUTO_STEP),
+    m_flat_field_calibration_frame(),
+    m_additional_ffc(ffc_image),
+    m_dead_pixel_mask()
+{
+    /* set ROI to exclude metadata frame regions */
+    m_raw_frame = m_raw_frame(roi);
+}
+
 SeekCam::~SeekCam()
 {
     close();
@@ -38,7 +58,9 @@ bool SeekCam::open()
 {
     if (m_ffc_filename != std::string()) {
         m_additional_ffc = cv::imread(m_ffc_filename, -1);
+    }
 
+    if (!m_additional_ffc.empty()) {
         if (m_additional_ffc.type() != m_raw_frame.type()) {
             error("Error: '%s' not found or it has the wrong type: %d\n",
                     m_ffc_filename.c_str(), m_additional_ffc.type());

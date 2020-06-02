@@ -30,6 +30,11 @@ public:
      */
     SeekThermalPro(std::string ffc_filename);
 
+    /*
+     *  ffc_image: Flat field calibration image (provided externally)
+     */
+    SeekThermalPro(const cv::Mat& ffc_image);
+
     virtual bool init_cam();
     virtual int frame_id();
     virtual int frame_counter();

@@ -72,6 +72,7 @@ public:
 protected:
 
     SeekCam(int vendor_id, int product_id, uint16_t* buffer, size_t raw_height, size_t raw_width, cv::Rect roi, std::string ffc_filename);
+    SeekCam(int vendor_id, int product_id, uint16_t* buffer, size_t raw_height, size_t raw_width, cv::Rect roi, const cv::Mat& ffc_image);
 
     virtual bool init_cam() = 0;
     virtual int frame_id() = 0;

@@ -19,11 +19,18 @@ SeekThermalPro::SeekThermalPro(std::string ffc_filename) :
             cv::Rect(1, 4, THERMAL_PRO_WIDTH, THERMAL_PRO_HEIGHT), ffc_filename)
 { }
 
+SeekThermalPro::SeekThermalPro(const cv::Mat& ffc_image) :
+    SeekCam(0x289d, 0x0011, m_buffer,
+            THERMAL_PRO_RAW_HEIGHT, THERMAL_PRO_RAW_WIDTH,
+            cv::Rect(1, 4, THERMAL_PRO_WIDTH, THERMAL_PRO_HEIGHT), ffc_image)
+{ }
+
 bool SeekThermalPro::init_cam()
 {
     {
         std::vector<uint8_t> data = { 0x01 };
         if (!m_dev.request_set(DeviceCommand::TARGET_PLATFORM, data)) {
+            warn("Device did not acknowledge TARGET_PLATFORM, retrying");   
             /* deinit and retry if cam was not properly closed */
             close();
             if (!m_dev.request_set(DeviceCommand::TARGET_PLATFORM, data))

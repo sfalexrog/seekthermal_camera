@@ -19,6 +19,12 @@ SeekThermal::SeekThermal(std::string ffc_filename) :
             cv::Rect(0, 1, THERMAL_WIDTH, THERMAL_HEIGHT), ffc_filename)
 { }
 
+SeekThermal::SeekThermal(const cv::Mat& ffc_image) :
+    SeekCam(0x289d, 0x0010, m_buffer,
+            THERMAL_RAW_HEIGHT, THERMAL_RAW_WIDTH,
+            cv::Rect(0, 1, THERMAL_WIDTH, THERMAL_HEIGHT), ffc_image)
+{ }
+
 bool SeekThermal::init_cam()
 {
     {
