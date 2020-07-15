@@ -90,9 +90,9 @@ void SeekThermalRos::reset()
 
 bool SeekThermalRos::init(int num_retries)
 {
-    reset();
     while (num_retries-- != 0)
     {
+        reset();
         if (seek_cam->open())
         {
             return true;
@@ -107,7 +107,7 @@ bool SeekThermalRos::init(int num_retries)
 
 bool SeekThermalRos::publish()
 {
-    if (!seek_cam) return false;
+    if (!seek_cam || !seek_cam->isOpened()) return false;
     if (!info_manager) return false;
     cv::Mat thermalImg;
     if(!seek_cam->read(thermalImg))
