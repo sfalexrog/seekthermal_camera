@@ -97,10 +97,8 @@ bool SeekThermalRos::init(int num_retries)
         {
             return true;
         }
-        else
-        {
-            ROS_WARN_NAMED(nodeName, "Could not initialize camera, retrying");
-        }
+        ROS_WARN_NAMED(nodeName, "Could not initialize camera, retrying");
+        ros::Duration(0.5).sleep();
     }
     return false;
 }
