@@ -17,12 +17,22 @@ private:
     ros::NodeHandle& nh_priv;
 
     image_transport::CameraPublisher pub;
-    image_transport::Publisher normalized_pub;
+    image_transport::Publisher thermal_image_pub;
     std::unique_ptr<camera_info_manager::CameraInfoManager> info_manager;
     std::unique_ptr<LibSeek::SeekCam> seek_cam;
     std::string frame_id;
     std::string model;
     cv::Mat ffc_image;
+
+    /**
+     * Calibration parameters:
+     *  - cal_beta: Temperature sensitivity
+     *  - linear_k: Linear model slope for device temperature compensation
+     *  - linear_offset: Linear model offset for device temperature compensation
+     */
+    float cal_beta;
+    float linear_k;
+    float linear_offset;
 
     /**
      * Perform reset of the underlying driver. This recreates the
@@ -48,6 +58,11 @@ public:
      * @return True if initialization is successful, false otherwise.
      */
     bool init(int num_retries = 1);
+
+    /**
+     * Convert raw image to thermal image.
+     */
+    void getThermalImage(const cv::Mat& src, cv::Mat& dst);
 
     void log(ros::console::levels::Level severity, const char* message);
     bool publish();

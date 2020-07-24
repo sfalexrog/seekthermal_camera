@@ -57,11 +57,15 @@ SeekThermalRos::SeekThermalRos(const std::string nodeName, ros::NodeHandle& nh, 
         }
     }
 
+    cal_beta = nh_priv.param<float>("cal_beta", 200.0f);
+    linear_k = nh_priv.param<float>("linear_k", -1.5276f);
+    linear_offset = nh_priv.param<float>("linear_offset", -470.8979f);
+
     info_manager.reset(new camera_info_manager::CameraInfoManager(nh, cameraName, cameraInfoUrl));
 
     image_transport::ImageTransport it(nh_priv);
     pub = it.advertiseCamera("image_raw", 1);
-    normalized_pub = it.advertise("image_norm", 1);
+    thermal_image_pub = it.advertise("thermal_image", 1);
 }
 
 SeekThermalRos::~SeekThermalRos() {}
@@ -103,6 +107,32 @@ bool SeekThermalRos::init(int num_retries)
     return false;
 }
 
+void SeekThermalRos::getThermalImage(const cv::Mat& src, cv::Mat& dst)
+{
+    dst.create(src.size(), CV_32FC1);
+    
+    auto device_k = [](float beta, int sensor_value) -> float {
+        constexpr auto ref_temp = 297.0f;
+        constexpr auto ref_sensor = 6616.0f;
+        float part3 = std::log(sensor_value/ref_sensor);
+        float parte = part3 / beta + 1.0 / ref_temp;
+        return 1.0 / parte;
+    }(cal_beta, seek_cam->device_temp_sensor());
+
+    auto temp_k = [&](uint16_t raw_value) -> float {
+        const float raw_scaled = raw_value * 330 / 16384.0f;
+        return raw_scaled - device_k * linear_k + linear_offset - 273.0f;
+    };
+
+    for(auto row = 0; row < src.rows; ++row)
+    {
+        for(auto col = 0; col < src.cols; ++col)
+        {
+            dst.at<float>(row, col) = temp_k(src.at<uint16_t>(row, col));
+        }
+    }
+}
+
 bool SeekThermalRos::publish()
 {
     if (!seek_cam || !seek_cam->isOpened()) return false;
@@ -123,11 +153,11 @@ bool SeekThermalRos::publish()
     cameraInfo->header.stamp = header.stamp;
     cameraInfo->header.frame_id = header.frame_id;
     pub.publish(pubImg->toImageMsg(), cameraInfo);
-    if (normalized_pub.getNumSubscribers() > 0)
+    if (thermal_image_pub.getNumSubscribers() > 0)
     {
-        cv_bridge::CvImagePtr normPubImg = boost::make_shared<cv_bridge::CvImage>(header, "mono16");
-        cv::normalize(thermalImg, normPubImg->image, 0, 65536, cv::NORM_MINMAX);
-        normalized_pub.publish(normPubImg->toImageMsg());
+        cv_bridge::CvImagePtr thermalImgProcessed = boost::make_shared<cv_bridge::CvImage>(header, "32FC1");
+        getThermalImage(thermalImg, thermalImgProcessed->image);
+        thermal_image_pub.publish(thermalImgProcessed->toImageMsg());
     }
     return true;
 }
