@@ -145,12 +145,12 @@ bool SeekThermalRos::publish()
         return false;
     }
 
+    std_msgs::Header header;
+    header.stamp = ros::Time::now();
+    header.frame_id = frame_id;
+
     if (pub.getNumSubscribers() > 0)
     {
-        std_msgs::Header header;
-        header.stamp = ros::Time::now();
-        header.frame_id = frame_id;
-
         cv_bridge::CvImagePtr pubImg = boost::make_shared<cv_bridge::CvImage>(header, "16UC1", thermalImg);
         sensor_msgs::CameraInfoPtr cameraInfo = boost::make_shared<sensor_msgs::CameraInfo>(info_manager->getCameraInfo());
         cameraInfo->header.stamp = header.stamp;
